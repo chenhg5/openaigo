@@ -105,7 +105,13 @@ func (client *Client) bodyToReader(body interface{}) (io.Reader, string, error) 
 
 func (client *Client) execute(req *http.Request, response interface{}) error {
 	if client.HTTPClient == nil {
-		client.HTTPClient = http.DefaultClient
+		client.HTTPClient = &http.Client{
+			Transport: &http.Transport{
+				Proxy: func(r *http.Request) (*url.URL, error) {
+					return url.Parse("socks://127.0.0.1:1088")
+				},
+			},
+		}
 	}
 	httpres, err := client.HTTPClient.Do(req)
 	if err != nil {
